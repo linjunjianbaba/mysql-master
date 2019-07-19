@@ -1,0 +1,51 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: mysql-master
+  labels:
+    app: mysql-master
+spec:
+  type: NodePort
+  ports:
+  - name: mysql-master
+    port: 3306
+  selector:
+    app: mysql-master
+---
+apiVersion: apps/v1beta1
+kind: StatefulSet
+metadata:
+  name: mysql-master
+  labels:
+    name: mysql-master
+spec:
+  serviceName: mysql-master
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: mysql-master
+    spec:
+      terminationGracePeriodSeconds: 10
+      containers:
+      - name: mysql-master
+        image: k8sz/mysql-master:latest
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 3306
+        env:
+        - name: MYSQL_ROOT_PASSWORD
+          value: "zb@123.com"
+        - name: MYSQL_REPLICATION_USER
+          value: "sync"
+        - name: MYSQL_REPLICATION_PASSWORD
+          value: "zb@123.com"
+        volumeMounts:
+          - name: mysql-master-v
+            mountPath: /var/lib/mysql
+      nodeSelector:
+        nodetype: mysql-master
+      volumes:
+      - name: mysql-master-v
+        hostPath:
+          path: /data/mysql-master/data
