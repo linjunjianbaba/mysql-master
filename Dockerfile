@@ -69,7 +69,7 @@ RUN { \
 		| xargs -rt -0 sed -Ei 's/^(bind-address|log)/#&/' \
 # don't reverse lookup hostnames, they are usually another container
 	&& echo '[mysqld]\nskip-host-cache\nskip-name-resolve' > /etc/mysql/conf.d/docker.cnf \
-    && sed -i '/\[mysqld\]/a server-id=1\nlog-bin' /etc/mysql/mysql.conf.d/mysqld.cnf
+    && sed -i '/\[mysqld\]/a server-id=1\nlog-bin\nmax_connections=500' /etc/mysql/mysql.conf.d/mysqld.cnf 
 
 VOLUME /var/lib/mysql
 
